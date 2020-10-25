@@ -1,0 +1,58 @@
+version: '3.8'
+services: 
+  database:
+    image: oracle/database:19.3.0-ee
+    container_name: ruzio-oracle-db-19c
+    volumes:
+      - vol_oracle_db_19c:/opt/oracle/oradata
+    ports:
+      - 1521:1521
+      - 8888:8080
+      - 5500:5500
+    environment:
+      - ORACLE_SID=ORCLCDB1
+      - ORACLE_PDB=ORCLPDB1
+      - ORACLE_PWD=Oracle@123
+      - ORACLE_EDITION=enterprise
+      - ORACLE_CHARACTERSET=AL32UTF8
+    networks: 
+      - net
+  weblogic:
+    image: oracle/weblogic:12.2.1.4-generic
+    container_name: ruzio-oracle-weblogic-12c
+    volumes:
+      - vol_oracle_wls_12c:/u01/oracle/properties
+    ports:
+      - 7001:7001
+      - 7002:7002
+      - 7003:7003
+      - 7004:7004
+      - 9001:9001
+      - 5556:5556
+    environment:
+      - DOMAIN_NAME=core_domain
+      - ADMIN_LISTEN_PORT=7001
+      - ADMINISTRATION_PORT=9001
+      - ADMINISTRATION_PORT_ENABLED=false
+    networks: 
+      - net
+  jenkins:
+    image: jenkinsci/blueocean
+    container_name: ruzio-jenkins-blueocean
+    user: root
+    ports:
+      - "8077:8080"
+      - "8443:8443"
+      - "50000:50000"
+    volumes:
+      - vol_jenkins:/var/jenkins_home
+          ##### Mac OS X and Linux ONLY #####
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - net
+networks:
+  net:
+volumes:
+  vol_jenkins:
+  vol_oracle_db_19c:
+  vol_oracle_wls_12c:
