@@ -50,9 +50,45 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - net
+  sonarqube:
+    image: sonarqube:8.2-community
+    container_name: ruzio-sonarqube
+    ports:
+      - "9000:9000"
+    networks:
+      - net
+    volumes:
+      - vol_sonarqube_data:/opt/sonarqube/data
+      - vol_sonarqube_extensions:/opt/sonarqube/extensions
+      - vol_sonarqube_logs:/opt/sonarqube/logs
+      - vol_sonarqube_temp:/opt/sonarqube/temp
+  gitlab:
+    image: 'gitlab/gitlab-ce:latest'
+    container_name: ruzio-gitlab
+    hostname: '192.168.0.110'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://192.168.0.110:9001'
+        gitlab_rails['gitlab_shell_ssh_port'] = 24
+    ports:
+      - '9001:80'
+      - '24:22'
+    volumes:
+      - vol_gitlab_config:/etc/gitlab
+      - vol_gitlab_logs:/var/log/gitlab
+      - vol_gitlab_data:/var/opt/gitlab
+    networks:
+      - net
 networks:
   net:
 volumes:
   vol_jenkins:
   vol_oracle_db_19c:
   vol_oracle_wls_12c:
+  vol_sonarqube_data:
+  vol_sonarqube_extensions:
+  vol_sonarqube_logs:
+  vol_sonarqube_temp:
+  vol_gitlab_config:
+  vol_gitlab_logs:
+  vol_gitlab_data:
