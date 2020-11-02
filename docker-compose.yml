@@ -16,7 +16,7 @@ services:
       - ORACLE_EDITION=enterprise
       - ORACLE_CHARACTERSET=AL32UTF8
     networks: 
-      - net
+      - docker_net
   weblogic:
     image: oracle/weblogic:12.2.1.4-generic
     container_name: ruzio-oracle-weblogic-12c
@@ -35,13 +35,13 @@ services:
       - ADMINISTRATION_PORT=9001
       - ADMINISTRATION_PORT_ENABLED=false
     networks: 
-      - net
+      - docker_net
   jenkins:
     image: jenkinsci/blueocean
     container_name: ruzio-jenkins-blueocean
     user: root
     ports:
-      - "8077:8080"
+      - "9002:8080"
       - "8443:8443"
       - "50000:50000"
     volumes:
@@ -49,14 +49,14 @@ services:
           ##### Mac OS X and Linux ONLY #####
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - net
+      - docker_net
   sonarqube:
     image: sonarqube:8.2-community
     container_name: ruzio-sonarqube
     ports:
       - "9000:9000"
     networks:
-      - net
+      - docker_net
     volumes:
       - vol_sonarqube_data:/opt/sonarqube/data
       - vol_sonarqube_extensions:/opt/sonarqube/extensions
@@ -68,27 +68,37 @@ services:
     hostname: '192.168.0.110'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://192.168.0.110:9001'
         gitlab_rails['gitlab_shell_ssh_port'] = 24
     ports:
-      - '9001:80'
+      - '9003:80'
       - '24:22'
     volumes:
       - vol_gitlab_config:/etc/gitlab
       - vol_gitlab_logs:/var/log/gitlab
       - vol_gitlab_data:/var/opt/gitlab
     networks:
-      - net
+      - docker_net
 networks:
-  net:
+  docker_net:
+    name: docker_net
 volumes:
   vol_jenkins:
+    name: vol_jenkins
   vol_oracle_db_19c:
+    name: vol_oracle_db_19c
   vol_oracle_wls_12c:
+    name: vol_oracle_wls_12c
   vol_sonarqube_data:
+    name: vol_sonarqube_data
   vol_sonarqube_extensions:
+    name: vol_sonarqube_extensions
   vol_sonarqube_logs:
+    name: vol_sonarqube_logs
   vol_sonarqube_temp:
+    name: vol_sonarqube_temp
   vol_gitlab_config:
+    name: vol_gitlab_config
   vol_gitlab_logs:
+    name: vol_gitlab_logs
   vol_gitlab_data:
+    name: vol_getlab_data
